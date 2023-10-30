@@ -15,9 +15,12 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
       List? alltodos = prefs.getStringList("todo");
       if (alltodos == null) {
         prefs.setStringList("todo", []);
+      } else if (alltodos == []) {
+        TodoLoadedState(alltodos);
       } else {
         emit(TodoLoadedState(alltodos));
       }
+      print(alltodos);
     });
     on<CreateTodo>((event, emit) async {
       Map data = {

@@ -68,89 +68,96 @@ class _TodoListState extends State<TodoList> {
       body: BlocBuilder<TodoBloc, TodoState>(
         builder: (context, state) {
           if (state is TodoLoadedState) {
-            return ListView.separated(
-                // reverse: true,
-                itemCount: state.alltodo.length,
-                // itemExtent: 60,
-                padding: const EdgeInsets.all(20),
-                separatorBuilder: (context, index) => const SizedBox(
-                      height: 10,
-                    ),
-                itemBuilder: (context, index) {
-                  var sd = json.decode(state.alltodo[index]);
-                  print(sd.runtimeType);
-                  return ListTile(
-                    shape: const RoundedRectangleBorder(
-                        side: BorderSide(color: Colors.black),
-                        borderRadius: BorderRadius.all(Radius.circular(10.0))),
-                    title: Text("${sd["Task"]}"),
-                    subtitle: Text("${sd["Dropdown"]} ${sd["Time"]} "),
-                    leading: const Icon(Icons.add_task_rounded),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () => {
-                        showDialog(
-                          barrierDismissible: false,
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text(
-                              "Confirmation to Delete Todo",
-                              style: TextStyle(fontSize: 20),
-                            ),
-                            actions: [
-                              const Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  "Want to Delete todo ?",
-                                  textAlign: TextAlign.left,
-                                ),
+            if (state.alltodo.isNotEmpty) {
+              return ListView.separated(
+                  // reverse: true,
+                  itemCount: state.alltodo.length,
+                  // itemExtent: 60,
+                  padding: const EdgeInsets.all(20),
+                  separatorBuilder: (context, index) => const SizedBox(
+                        height: 10,
+                      ),
+                  itemBuilder: (context, index) {
+                    var sd = json.decode(state.alltodo[index]);
+                    print(sd.runtimeType);
+                    return ListTile(
+                      shape: const RoundedRectangleBorder(
+                          side: BorderSide(color: Colors.black),
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(10.0))),
+                      title: Text("${sd["Task"]}"),
+                      subtitle: Text("${sd["Dropdown"]} ${sd["Time"]} "),
+                      leading: const Icon(Icons.add_task_rounded),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () => {
+                          showDialog(
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text(
+                                "Confirmation to Delete Todo",
+                                style: TextStyle(fontSize: 20),
                               ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  ElevatedButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text('Cancel')),
-                                  const SizedBox(
-                                    width: 20,
+                              actions: [
+                                const Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    "Want to Delete todo ?",
+                                    textAlign: TextAlign.left,
                                   ),
-                                  ElevatedButton(
-                                      onPressed: () {
-                                        BlocProvider.of<TodoBloc>(context)
-                                            .add(DeleteTodo(index));
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text('Confirm')),
-                                ],
-                              )
-                            ],
-                          ),
-                        ).then((value) => {
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('Cancel')),
+                                    const SizedBox(
+                                      width: 20,
+                                    ),
+                                    ElevatedButton(
+                                        onPressed: () {
+                                          BlocProvider.of<TodoBloc>(context)
+                                              .add(DeleteTodo(index));
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('Confirm')),
+                                  ],
+                                )
+                              ],
+                            ),
+                          ).then((value) => {
+                                BlocProvider.of<TodoBloc>(context)
+                                    .add(TodoLoadEvent())
+                              })
+                        },
+                      ),
+                      onLongPress: () {
+                        showDialog(
+                            context: context,
+                            builder: (context) => UpdateDialogTodo(
+                                  task: sd,
+                                  index: index,
+                                )).then((value) => {
                               BlocProvider.of<TodoBloc>(context)
                                   .add(TodoLoadEvent())
-                            })
+                            });
                       },
-                    ),
-                    onLongPress: () {
-                      showDialog(
-                          context: context,
-                          builder: (context) => UpdateDialogTodo(
-                                task: sd,
-                                index: index,
-                              )).then((value) => {
-                            BlocProvider.of<TodoBloc>(context)
-                                .add(TodoLoadEvent())
-                          });
-                    },
-                  );
-                });
+                    );
+                  });
+            } else {
+              return const Center(child: Text("No Data"));
+            }
           } else {
-            return Text("Loading");
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
           }
         },
       ),
