@@ -1,3 +1,5 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
@@ -11,16 +13,18 @@ part 'todo_state.dart';
 class TodoBloc extends Bloc<TodoEvent, TodoState> {
   TodoBloc() : super(TodoInitial()) {
     on<TodoLoadEvent>((event, emit) async {
+      emit(TodoNotLoadedState());
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       List? alltodos = prefs.getStringList("todo");
+      print(alltodos);
       if (alltodos == null) {
         prefs.setStringList("todo", []);
+        emit(TodoLoadedState([]));
       } else if (alltodos == []) {
         TodoLoadedState(alltodos);
       } else {
         emit(TodoLoadedState(alltodos));
       }
-      print(alltodos);
     });
     on<CreateTodo>((event, emit) async {
       Map data = {

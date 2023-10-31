@@ -154,9 +154,13 @@ class _TodoListState extends State<TodoList> {
             } else {
               return const Center(child: Text("No Data"));
             }
-          } else {
+          } else if (state is TodoNotLoadedState) {
             return const Center(
               child: CircularProgressIndicator(),
+            );
+          } else {
+            return const Center(
+              child: Text("Somethings Went Wrong"),
             );
           }
         },
